@@ -6,16 +6,17 @@
     <title>CanopySync AI - Text Budtender</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Force the ElevenLabs widget to center nicely in our layout instead of hiding in the corner */
         elevenlabs-convai {
-            width: 100%;
-            height: 100%;
+            --elevenlabs-convai-widget-width: 100%;
+            --elevenlabs-convai-widget-height: 100%;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 flex flex-col h-screen font-sans overflow-hidden">
+<body class="bg-slate-950 text-slate-100 flex flex-col h-screen font-sans">
 
     <!-- Header -->
-    <header class="bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between shadow-md">
+    <header class="bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between shadow-md z-10">
         <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-lg text-white">AI</div>
             <div>
@@ -30,21 +31,31 @@
         </div>
     </header>
 
-    <!-- Chat Widget Container -->
-    <main class="flex-1 flex flex-col items-center justify-center p-3 relative w-full">
-        <div class="w-full max-w-xl h-full max-h-[80vh] flex flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl p-2">
-            <!-- ElevenLabs Web Component -->
-            <elevenlabs-convai agent-id="agent_3801m533p29rez7b5t1j8ra4gz3"></elevenlabs-convai>
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col items-center justify-center p-4 relative w-full max-w-xl mx-auto">
+        <div class="text-center space-y-3 mb-6">
+            <div class="w-14 h-14 bg-emerald-600/20 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto text-emerald-400 text-2xl font-bold">🌿</div>
+            <h2 class="text-xl font-bold text-white">Ask Your AI Budtender</h2>
+            <p class="text-sm text-slate-400 max-w-sm mx-auto">
+                Tell us what effects you're looking for, your tolerance level, and any feelings you'd like to avoid. Tap the chat bubble to begin!
+            </p>
         </div>
+
+        <!-- ElevenLabs Widget (Fixed Agent ID with 'x' + Expanded/Text-Only attributes) -->
+        <elevenlabs-convai 
+            agent-id="agent_3801m533p29rez7b5t1xj8ra4gz3" 
+            variant="expanded" 
+            text-only="true">
+        </elevenlabs-convai>
     </main>
 
     <!-- Footer Disclaimer -->
-    <footer class="bg-slate-900 border-t border-slate-800 p-2 text-center">
+    <footer class="bg-slate-900 border-t border-slate-800 p-2.5 text-center z-10">
         <p class="text-[10px] text-slate-500">Powered by CanopySync AI • 21+ Age Verification Required at Register</p>
     </footer>
 
-    <!-- ElevenLabs Widget Script -->
-    <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+    <!-- Official ElevenLabs Widget Embed Script -->
+    <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
