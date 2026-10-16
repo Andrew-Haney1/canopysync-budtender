@@ -3,20 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CanopySync AI - Text Budtender</title>
+    <title>CanopySync AI - Live AI Budtender</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Force the ElevenLabs widget to center nicely in our layout instead of hiding in the corner */
+        /* Force the ElevenLabs widget to take up the full main screen area */
         elevenlabs-convai {
-            --elevenlabs-convai-widget-width: 100%;
-            --elevenlabs-convai-widget-height: 100%;
+            position: fixed !important;
+            top: 73px !important;
+            bottom: 38px !important;
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+            height: calc(100vh - 111px) !important;
+            --elevenlabs-convai-widget-width: 100vw;
+            --elevenlabs-convai-widget-height: calc(100vh - 111px);
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 flex flex-col h-screen font-sans">
+<body class="bg-slate-950 text-slate-100 flex flex-col h-screen font-sans overflow-hidden">
 
-    <!-- Header -->
-    <header class="bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between shadow-md z-10">
+    <!-- Header (73px height) -->
+    <header class="bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between shadow-md z-50 h-[73px]">
         <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-lg text-white">AI</div>
             <div>
@@ -31,26 +42,19 @@
         </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col items-center justify-center p-4 relative w-full max-w-xl mx-auto">
-        <div class="text-center space-y-3 mb-6">
-            <div class="w-14 h-14 bg-emerald-600/20 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto text-emerald-400 text-2xl font-bold">🌿</div>
-            <h2 class="text-xl font-bold text-white">Ask Your AI Budtender</h2>
-            <p class="text-sm text-slate-400 max-w-sm mx-auto">
-                Tell us what effects you're looking for, your tolerance level, and any feelings you'd like to avoid. Tap the chat bubble to begin!
-            </p>
-        </div>
-
-        <!-- ElevenLabs Widget (Fixed Agent ID with 'x' + Expanded/Text-Only attributes) -->
+    <!-- Full-Screen Widget Area -->
+    <main class="flex-1 relative w-full bg-slate-950">
         <elevenlabs-convai 
+            id="budtender-widget"
             agent-id="agent_3801m533p29rez7b5t1xj8ra4gz3" 
             variant="expanded" 
+            dismissible="false"
             text-only="true">
         </elevenlabs-convai>
     </main>
 
-    <!-- Footer Disclaimer -->
-    <footer class="bg-slate-900 border-t border-slate-800 p-2.5 text-center z-10">
+    <!-- Footer Disclaimer (38px height) -->
+    <footer class="bg-slate-900 border-t border-slate-800 p-2.5 text-center z-50 h-[38px] flex items-center justify-center">
         <p class="text-[10px] text-slate-500">Powered by CanopySync AI • 21+ Age Verification Required at Register</p>
     </footer>
 
@@ -59,11 +63,31 @@
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
+            // Dynamic store name from URL (?store=Apotheca)
             const urlParams = new URLSearchParams(window.location.search);
             const store = urlParams.get('store');
             if (store) {
                 document.getElementById('dispensary-name').innerText = decodeURIComponent(store);
             }
+
+            // Programmatically auto-expand/start the widget once loaded
+            const widget = document.getElementById('budtender-widget');
+            const tryAutoOpen = setInterval(() => {
+                if (widget && typeof widget.startConversation === 'function') {
+                    widget.startConversation();
+                    clearInterval(tryAutoOpen);
+                } else if (widget && widget.shadowRoot) {
+                    // Fallback: click the launcher button inside the shadow DOM if it rendered collapsed
+                    const launchBtn = widget.shadowRoot.querySelector('button');
+                    if (launchBtn) {
+                        launchBtn.click();
+                        clearInterval(tryAutoOpen);
+                    }
+                }
+            }, 400);
+
+            // Stop polling after 6 seconds
+            setTimeout(() => clearInterval(tryAutoOpen), 6000);
         });
     </script>
 </body>
