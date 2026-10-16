@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CanopySync AI - Live AI Budtender</title>
+    <title>CanopySync AI - Text Budtender</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen font-sans">
@@ -15,7 +15,7 @@
             <div>
                 <h1 class="font-bold text-base leading-tight">CanopySync AI Budtender</h1>
                 <p class="text-xs text-emerald-400 flex items-center mt-0.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-1.5"></span> Live AI & Inventory Active
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-1.5"></span> Text Assistant Active
                 </p>
             </div>
         </div>
@@ -24,20 +24,16 @@
         </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col items-center justify-center p-4">
-        <div class="text-center space-y-4 max-w-md">
-            <div class="w-16 h-16 bg-emerald-600/20 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto text-emerald-400 text-2xl font-bold">🌿</div>
-            <h2 class="text-xl font-bold">Your AI Budtender is Live</h2>
-            <p class="text-sm text-slate-400">Click the <strong class="text-emerald-400">"Start a call"</strong> button at the bottom right to talk directly with your AI Budtender, or tap below to launch the assistant.</p>
-            <div class="pt-2">
-                <elevenlabs-convai agent-id="agent_3801m533p29rez7b5t1j8ra4gz3"></elevenlabs-convai>
-            </div>
+    <!-- Chat Widget Container -->
+    <main class="flex-1 flex flex-col items-center justify-center p-2 relative max-w-xl w-full mx-auto">
+        <div class="w-full h-full flex flex-col bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+            <!-- ElevenLabs Widget with text-only attribute -->
+            <elevenlabs-convai agent-id="agent_3801m533p29rez7b5t1j8ra4gz3" text-only="true"></elevenlabs-convai>
         </div>
     </main>
 
     <!-- Footer Disclaimer -->
-    <footer class="bg-slate-900 border-t border-slate-800 p-3 text-center">
+    <footer class="bg-slate-900 border-t border-slate-800 p-2.5 text-center">
         <p class="text-[10px] text-slate-500">Powered by CanopySync AI • 21+ Age Verification Required at Register</p>
     </footer>
 
