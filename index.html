@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CanopySync AI - In-Store Budtender Demo</title>
+    <title>CanopySync AI - In-Store Budtender</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 flex flex-col h-screen font-sans">
@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="text-right">
-            <span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">Apotheca Dispensary</span>
+            <span id="dispensary-name" class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">Partner Dispensary</span>
         </div>
     </header>
 
@@ -29,14 +29,14 @@
         <!-- AI Welcome Message -->
         <div class="flex items-start space-x-2">
             <div class="w-8 h-8 rounded-full bg-emerald-600 flex-shrink-0 flex items-center justify-center text-xs font-bold">AI</div>
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm p-3.5 max-w-[85%] text-sm shadow-sm">
-                <p>Welcome to <strong>Apotheca</strong>! I'm your AI Budtender powered by CanopySync AI. What kind of vibe or effect are you looking for today?</p>
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm p-3.5 max-w-[85%] text-sm shadow-sm space-y-3">
+                <p>Welcome! I'm your AI Budtender. What kind of vibe, effects, or product type are you looking for today?</p>
                 
                 <!-- Quick Tap Options -->
-                <div class="mt-3 flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2 pt-1">
                     <button onclick="handleQuickSelect('Sleep & Heavy Relaxation')" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/60 text-xs px-3 py-1.5 rounded-full transition">🌙 Sleep & Relaxation</button>
                     <button onclick="handleQuickSelect('Energy & Creative Focus')" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/60 text-xs px-3 py-1.5 rounded-full transition">⚡ Energy & Focus</button>
-                    <button onclick="handleQuickSelect('Today\'s VIP Deals')" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/60 text-xs px-3 py-1.5 rounded-full transition">🔥 Today's VIP Deals</button>
+                    <button onclick="handleQuickSelect('Show Today\'s VIP Deals')" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/60 text-xs px-3 py-1.5 rounded-full transition">🔥 Today's VIP Deals</button>
                 </div>
             </div>
         </div>
@@ -45,16 +45,25 @@
     <!-- Input Bar -->
     <div class="bg-slate-900 border-t border-slate-800 p-3 max-w-xl w-full mx-auto">
         <form id="chat-form" onsubmit="handleUserSubmit(event)" class="flex items-center space-x-2">
-            <input type="text" id="user-input" placeholder="Type a strain or effect (e.g., Indica, Sleep)..." 
+            <input type="text" id="user-input" placeholder="Ask anything about strains, effects, or deals..." 
                 class="flex-1 bg-slate-950 border border-slate-800 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 text-slate-100 placeholder-slate-500">
             <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-full text-sm font-medium transition flex items-center justify-center">
                 Send
             </button>
         </form>
-        <p class="text-[10px] text-center text-slate-500 mt-2">Powered by CanopySync AI • 21+ Verification Required at Counter</p>
+        <p class="text-[10px] text-center text-slate-500 mt-2">Powered by CanopySync AI • 21+ Age Verification Required</p>
     </div>
 
     <script>
+        // Check URL parameters for dynamic dispensary branding (e.g., ?store=Green+Thumb)
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const store = urlParams.get('store');
+            if (store) {
+                document.getElementById('dispensary-name').innerText = decodeURIComponent(store);
+            }
+        });
+
         const inventory = [
             { name: "Northern Lights (THCA Flower)", type: "Indica", thca: "24.5%", terpenes: "Myrcene, Caryophyllene", effects: "Deep relaxation, body calm", price: "$45 / 3.5g", stock: "In Stock" },
             { name: "Super Lemon Haze", type: "Sativa", thca: "26.2%", terpenes: "Terpinolene, Limonene", effects: "Uplifting, creative focus", price: "$50 / 3.5g", stock: "In Stock" },
@@ -69,7 +78,7 @@
                 messageDiv.className = "flex items-start justify-end space-x-2";
                 messageDiv.innerHTML = `
                     <div class="bg-emerald-600 text-white rounded-2xl rounded-tr-sm p-3.5 max-w-[85%] text-sm shadow-sm">
-                        <p>${htmlContent}</p>
+                        <p>${escapeHtml(htmlContent)}</p>
                     </div>
                 `;
             } else {
@@ -83,6 +92,11 @@
             }
             container.appendChild(messageDiv);
             container.scrollTop = container.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
         }
 
         function handleQuickSelect(choice) {
@@ -101,61 +115,80 @@
         }
 
         function processBotResponse(query) {
+            // Simulate typing delay
             setTimeout(() => {
                 let responseHtml = "";
                 const q = query.toLowerCase();
 
-                if (q.includes('sleep') || q.includes('indica') || q.includes('relaxation')) {
+                if (q.includes('sleep') || q.includes('indica') || q.includes('relaxation') || q.includes('calm')) {
                     const item = inventory[0];
                     responseHtml = `
-                        <p>Based on your request for <strong>${query}</strong>, our live inventory lookup recommends:</p>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 mt-2 space-y-1">
+                        <p>Based on your request for <strong>${escapeHtml(query)}</strong>, our live inventory recommends:</p>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
                             <div class="font-bold text-emerald-400">${item.name} (${item.type})</div>
                             <div class="text-xs text-slate-300">THCA: ${item.thca} | Terpenes: ${item.terpenes}</div>
                             <div class="text-xs text-slate-400">Effects: ${item.effects}</div>
                             <div class="text-xs font-semibold text-emerald-300 mt-1">Price: ${item.price} • <span class="text-emerald-500">${item.stock}</span></div>
                         </div>
-                        <p class="mt-2 text-xs text-slate-300">Want a 15% off VIP coupon for this strain right now?</p>
-                        <div class="mt-2">
+                        <p class="text-xs text-slate-300 mt-1">Want a 15% off VIP coupon for this strain?</p>
+                        <div>
                             <button onclick="showCouponForm('${item.name}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 rounded-lg font-medium transition">Get 15% Off VIP Coupon</button>
                         </div>
                     `;
-                } else if (q.includes('deal') || q.includes('vip')) {
+                } else if (q.includes('energy') || q.includes('sativa') || q.includes('focus') || q.includes('creative')) {
+                    const item = inventory[1];
                     responseHtml = `
-                        <p>🔥 <strong>Today's Apotheca VIP Deals:</strong></p>
-                        <ul class="list-disc list-inside text-xs space-y-1 text-slate-300 mt-1">
+                        <p>For an uplifting experience, here is our top recommendation in stock:</p>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+                            <div class="font-bold text-emerald-400">${item.name} (${item.type})</div>
+                            <div class="text-xs text-slate-300">THCA: ${item.thca} | Terpenes: ${item.terpenes}</div>
+                            <div class="text-xs text-slate-400">Effects: ${item.effects}</div>
+                            <div class="text-xs font-semibold text-emerald-300 mt-1">Price: ${item.price} • <span class="text-emerald-500">${item.stock}</span></div>
+                        </div>
+                        <p class="text-xs text-slate-300 mt-1">Would you like a VIP discount code for this?</p>
+                        <div>
+                            <button onclick="showCouponForm('${item.name}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 rounded-lg font-medium transition">Get 15% Off VIP Coupon</button>
+                        </div>
+                    `;
+                } else if (q.includes('deal') || q.includes('vip') || q.includes('special')) {
+                    responseHtml = `
+                        <p>🔥 <strong>Today's Exclusive VIP Store Deals:</strong></p>
+                        <ul class="list-disc list-inside text-xs space-y-1 text-slate-300">
                             <li>20% off all top-shelf flower jars this weekend.</li>
-                            <li>Buy any cart, get a pre-roll for $1.</li>
+                            <li>Buy any concentrate cart, get a pre-roll for $1.</li>
                         </ul>
-                        <p class="mt-2 text-xs text-slate-300">Enter your email to instantly unlock your digital VIP barcode to show at the counter:</p>
-                        <div class="mt-2">
+                        <p class="text-xs text-slate-300 mt-2">Enter your email below to unlock your digital VIP barcode:</p>
+                        <div>
                             <button onclick="showCouponForm('General VIP Deal')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 rounded-lg font-medium transition">Claim VIP Barcode</button>
                         </div>
                     `;
                 } else {
                     responseHtml = `
-                        <p>Here are our top live recommendations in stock right now:</p>
-                        <div class="space-y-2 mt-2">
+                        <p>I can help you find exactly what you need! Here are our featured live items right now:</p>
+                        <div class="space-y-2">
                             <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs">
                                 <span class="font-bold text-emerald-400">1. ${inventory[0].name}</span> — ${inventory[0].price} (${inventory[0].stock})
                             </div>
                             <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs">
                                 <span class="font-bold text-emerald-400">2. ${inventory[1].name}</span> — ${inventory[1].price} (${inventory[1].stock})
                             </div>
+                            <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs">
+                                <span class="font-bold text-emerald-400">3. ${inventory[2].name}</span> — ${inventory[2].price} (${inventory[2].stock})
+                            </div>
                         </div>
-                        <p class="mt-2 text-xs text-slate-300">Tap a category above or type what effects you're looking for!</p>
+                        <p class="text-xs text-slate-300">Feel free to type any effect (e.g., <em>pain relief</em>, <em>hybrid</em>) or ask a question!</p>
                     `;
                 }
                 appendMessage('bot', responseHtml);
-            }, 600);
+            }, 500);
         }
 
         function showCouponForm(strainName) {
             const formHtml = `
-                <p>Enter your email to claim your VIP coupon for <strong>${strainName}</strong>:</p>
-                <div class="mt-2 flex space-x-2">
-                    <input type="email" id="vip-email" placeholder="Enter your email..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs flex-1 text-slate-100">
-                    <button onclick="submitVipEmail('${strainName}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-2 rounded-lg font-medium transition">Submit</button>
+                <p>Enter your email to claim your VIP coupon for <strong>${escapeHtml(strainName)}</strong>:</p>
+                <div class="flex space-x-2 pt-1">
+                    <input type="email" id="vip-email" placeholder="Enter your email..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs flex-1 text-slate-100 focus:outline-none focus:border-emerald-500">
+                    <button onclick="submitVipEmail('${escapeHtml(strainName)}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-2 rounded-lg font-medium transition">Submit</button>
                 </div>
             `;
             appendMessage('bot', formHtml);
@@ -169,9 +202,9 @@
             }
             const successHtml = `
                 <div class="bg-emerald-950/40 border border-emerald-800/60 p-3 rounded-xl text-center space-y-1">
-                    <div class="font-bold text-emerald-400 text-sm">🎉 VIP Coupon Unlocked!</div>
-                    <div class="text-xs text-slate-300">Code: <span class="font-mono bg-slate-900 px-2 py-0.5 rounded text-emerald-300 font-bold">VIP-CANOPY-15</span></div>
-                    <div class="text-[11px] text-slate-400">Show this screen to your budtender at checkout. We also sent a copy to ${emailInput.value}!</div>
+                    <div class="font-bold text-emerald-400 text-sm">🎉 VIP Pass Unlocked!</div>
+                    <div class="text-xs text-slate-300">Code: <span class="font-mono bg-slate-900 px-2 py-0.5 rounded text-emerald-300 font-bold">CANOPY-VIP-15</span></div>
+                    <div class="text-[11px] text-slate-400">Show this screen to your budtender at checkout. Confirmation sent to ${escapeHtml(emailInput.value)}!</div>
                 </div>
             `;
             appendMessage('bot', successHtml);
