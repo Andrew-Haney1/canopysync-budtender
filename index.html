@@ -5,8 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CanopySync AI - Text Budtender</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        elevenlabs-convai {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 flex flex-col h-screen font-sans">
+<body class="bg-slate-950 text-slate-100 flex flex-col h-screen font-sans overflow-hidden">
 
     <!-- Header -->
     <header class="bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between shadow-md">
@@ -25,15 +31,15 @@
     </header>
 
     <!-- Chat Widget Container -->
-    <main class="flex-1 flex flex-col items-center justify-center p-2 relative max-w-xl w-full mx-auto">
-        <div class="w-full h-full flex flex-col bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-            <!-- ElevenLabs Widget with text-only attribute -->
-            <elevenlabs-convai agent-id="agent_3801m533p29rez7b5t1j8ra4gz3" text-only="true"></elevenlabs-convai>
+    <main class="flex-1 flex flex-col items-center justify-center p-3 relative w-full">
+        <div class="w-full max-w-xl h-full max-h-[80vh] flex flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl p-2">
+            <!-- ElevenLabs Web Component -->
+            <elevenlabs-convai agent-id="agent_3801m533p29rez7b5t1j8ra4gz3"></elevenlabs-convai>
         </div>
     </main>
 
     <!-- Footer Disclaimer -->
-    <footer class="bg-slate-900 border-t border-slate-800 p-2.5 text-center">
+    <footer class="bg-slate-900 border-t border-slate-800 p-2 text-center">
         <p class="text-[10px] text-slate-500">Powered by CanopySync AI • 21+ Age Verification Required at Register</p>
     </footer>
 
