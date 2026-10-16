@@ -55,7 +55,7 @@
     </div>
 
     <script>
-        // Check URL parameters for dynamic dispensary branding (e.g., ?store=Green+Thumb)
+        // Check URL parameters for dynamic dispensary branding (e.g., ?store=Apotheca)
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const store = urlParams.get('store');
@@ -115,7 +115,6 @@
         }
 
         function processBotResponse(query) {
-            // Simulate typing delay
             setTimeout(() => {
                 let responseHtml = "";
                 const q = query.toLowerCase();
@@ -135,10 +134,10 @@
                             <button onclick="showCouponForm('${item.name}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 rounded-lg font-medium transition">Get 15% Off VIP Coupon</button>
                         </div>
                     `;
-                } else if (q.includes('energy') || q.includes('sativa') || q.includes('focus') || q.includes('creative')) {
+                } else if (q.includes('sativa') || q.includes('energy') || q.includes('focus') || q.includes('creative') || q.includes('lemon')) {
                     const item = inventory[1];
                     responseHtml = `
-                        <p>For an uplifting experience, here is our top recommendation in stock:</p>
+                        <p>Here is our available Sativa in stock:</p>
                         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
                             <div class="font-bold text-emerald-400">${item.name} (${item.type})</div>
                             <div class="text-xs text-slate-300">THCA: ${item.thca} | Terpenes: ${item.terpenes}</div>
@@ -146,6 +145,21 @@
                             <div class="text-xs font-semibold text-emerald-300 mt-1">Price: ${item.price} • <span class="text-emerald-500">${item.stock}</span></div>
                         </div>
                         <p class="text-xs text-slate-300 mt-1">Would you like a VIP discount code for this?</p>
+                        <div>
+                            <button onclick="showCouponForm('${item.name}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 rounded-lg font-medium transition">Get 15% Off VIP Coupon</button>
+                        </div>
+                    `;
+                } else if (q.includes('hybrid') || q.includes('cake') || q.includes('balanced')) {
+                    const item = inventory[2];
+                    responseHtml = `
+                        <p>Here is our top hybrid strain in stock:</p>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+                            <div class="font-bold text-emerald-400">${item.name} (${item.type})</div>
+                            <div class="text-xs text-slate-300">THCA: ${item.thca} | Terpenes: ${item.terpenes}</div>
+                            <div class="text-xs text-slate-400">Effects: ${item.effects}</div>
+                            <div class="text-xs font-semibold text-emerald-300 mt-1">Price: ${item.price} • <span class="text-emerald-500">${item.stock}</span></div>
+                        </div>
+                        <p class="text-xs text-slate-300 mt-1">Want a VIP coupon for this one?</p>
                         <div>
                             <button onclick="showCouponForm('${item.name}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 rounded-lg font-medium transition">Get 15% Off VIP Coupon</button>
                         </div>
@@ -164,7 +178,7 @@
                     `;
                 } else {
                     responseHtml = `
-                        <p>I can help you find exactly what you need! Here are our featured live items right now:</p>
+                        <p>Here is our complete live menu in stock right now:</p>
                         <div class="space-y-2">
                             <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs">
                                 <span class="font-bold text-emerald-400">1. ${inventory[0].name}</span> — ${inventory[0].price} (${inventory[0].stock})
@@ -176,7 +190,7 @@
                                 <span class="font-bold text-emerald-400">3. ${inventory[2].name}</span> — ${inventory[2].price} (${inventory[2].stock})
                             </div>
                         </div>
-                        <p class="text-xs text-slate-300">Feel free to type any effect (e.g., <em>pain relief</em>, <em>hybrid</em>) or ask a question!</p>
+                        <p class="text-xs text-slate-300 mt-1">Tap a strain above or ask about Indicas, Sativas, or Hybrids!</p>
                     `;
                 }
                 appendMessage('bot', responseHtml);
@@ -187,7 +201,7 @@
             const formHtml = `
                 <p>Enter your email to claim your VIP coupon for <strong>${escapeHtml(strainName)}</strong>:</p>
                 <div class="flex space-x-2 pt-1">
-                    <input type="email" id="vip-email" placeholder="Enter your email..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs flex-1 text-slate-100 focus:outline-none focus:border-emerald-500">
+                    <input type="email" id="vip-email" placeholder="Enter your email..." class="bg-slate-950 border border-slate-800 registered-email rounded-lg px-3 py-2 text-xs flex-1 text-slate-100 focus:outline-none focus:border-emerald-500">
                     <button onclick="submitVipEmail('${escapeHtml(strainName)}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-2 rounded-lg font-medium transition">Submit</button>
                 </div>
             `;
