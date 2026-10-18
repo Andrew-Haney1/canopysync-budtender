@@ -1,94 +1,735 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CanopySync AI - Live AI Budtender</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Force the ElevenLabs widget to take up the full main screen area */
-        elevenlabs-convai {
-            position: fixed !important;
-            top: 73px !important;
-            bottom: 38px !important;
-            left: 0 !important;
-            right: 0 !important;
-            width: 100% !important;
-            height: calc(100vh - 111px) !important;
-            --elevenlabs-convai-widget-width: 100vw;
-            --elevenlabs-convai-widget-height: calc(100vh - 111px);
-            z-index: 40;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
-</head>
-<body class="bg-slate-950 text-slate-100 flex flex-col h-screen font-sans overflow-hidden">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CanopySync AI — Live Virtual Budtender</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <!-- ElevenLabs ConvAI Widget Script -->
+  <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
 
-    <!-- Header (73px height) -->
-    <header class="bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between shadow-md z-50 h-[73px]">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-lg text-white">AI</div>
-            <div>
-                <h1 class="font-bold text-base leading-tight">CanopySync AI Budtender</h1>
-                <p class="text-xs text-emerald-400 flex items-center mt-0.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-1.5"></span> Text Assistant Active
-                </p>
-            </div>
-        </div>
-        <div class="text-right">
-            <span id="dispensary-name" class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">Partner Dispensary</span>
-        </div>
-    </header>
-
-    <!-- Full-Screen Widget Area -->
-    <main class="flex-1 relative w-full bg-slate-950">
-        <elevenlabs-convai 
-            id="budtender-widget"
-            agent-id="agent_3801m533p29rez7b5t1xj8ra4gz3" 
-            variant="expanded" 
-            dismissible="false"
-            text-only="true">
-        </elevenlabs-convai>
-    </main>
-
-    <!-- Footer Disclaimer (38px height) -->
-    <footer class="bg-slate-900 border-t border-slate-800 p-2.5 text-center z-50 h-[38px] flex items-center justify-center">
-        <p class="text-[10px] text-slate-500">Powered by CanopySync AI • 21+ Age Verification Required at Register</p>
-    </footer>
-
-    <!-- Official ElevenLabs Widget Embed Script -->
-    <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
-
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            // Dynamic store name from URL (?store=Apotheca)
-            const urlParams = new URLSearchParams(window.location.search);
-            const store = urlParams.get('store');
-            if (store) {
-                document.getElementById('dispensary-name').innerText = decodeURIComponent(store);
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            canopy: {
+              bg: '#070e0b',
+              card: '#0d1914',
+              border: '#183026',
+              emerald: '#10b981',
+              glow: '#34d399'
             }
+          }
+        }
+      }
+    }
+  </script>
 
-            // Programmatically auto-expand/start the widget once loaded
-            const widget = document.getElementById('budtender-widget');
-            const tryAutoOpen = setInterval(() => {
-                if (widget && typeof widget.startConversation === 'function') {
-                    widget.startConversation();
-                    clearInterval(tryAutoOpen);
-                } else if (widget && widget.shadowRoot) {
-                    // Fallback: click the launcher button inside the shadow DOM if it rendered collapsed
-                    const launchBtn = widget.shadowRoot.querySelector('button');
-                    if (launchBtn) {
-                        launchBtn.click();
-                        clearInterval(tryAutoOpen);
-                    }
-                }
-            }, 400);
+  <style>
+    body {
+      background-color: #070e0b;
+      background-image: 
+        radial-gradient(at 15% 10%, rgba(16, 185, 129, 0.14) 0px, transparent 45%),
+        radial-gradient(at 85% 25%, rgba(5, 150, 105, 0.10) 0px, transparent 50%),
+        radial-gradient(at 50% 90%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+      color: #f8fafc;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-            // Stop polling after 6 seconds
-            setTimeout(() => clearInterval(tryAutoOpen), 6000);
-        });
-    </script>
+    /* Subtle animated glow around the AI Budtender container */
+    .emerald-glow-box {
+      box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.22), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-card {
+      background: rgba(13, 25, 20, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    /* High-contrast barcode pattern for Cashier Ticket */
+    .visual-barcode {
+      background: repeating-linear-gradient(
+        90deg,
+        #0f172a,
+        #0f172a 3px,
+        transparent 3px,
+        transparent 6px,
+        #0f172a 6px,
+        #0f172a 7px,
+        transparent 7px,
+        transparent 11px,
+        #0f172a 11px,
+        #0f172a 15px,
+        transparent 15px,
+        transparent 17px
+      );
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #070e0b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #183026;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #10b981;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-emerald-500 selection:text-slate-950 pb-28">
+
+  <!-- TOP ANNOUNCEMENT / STORE DEMO BAR -->
+  <div class="border-b border-emerald-950/80 bg-[#050a08]/90 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      <!-- Brand + Live Status -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-900/40">
+          <!-- Cannabis / Leaf Sparkle SVG -->
+          <svg class="w-5 h-5 text-slate-950" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C9.5 6.5 7 9.5 7 13a5 5 0 0010 0c0-3.5-2.5-6.5-5-11zm0 16a3 3 0 01-3-3c0-2 1.5-4.2 3-7 1.5 2.8 3 5 3 7a3 3 0 01-3 3z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-display font-bold text-base sm:text-lg tracking-tight text-white">CanopySync <span class="text-emerald-400">AI</span></span>
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              Live Menu Sync
+            </span>
+          </div>
+          <p id="activeStoreSubtext" class="text-[11px] text-slate-400">Charlotte Dispensary Live Pilot • 103 Items Synced</p>
+        </div>
+      </div>
+
+      <!-- Store Switcher (For Monday Field Demos) & Config Button -->
+      <div class="flex items-center gap-2">
+        <label for="storeSelector" class="sr-only">Select Dispensary Location</label>
+        <select id="storeSelector" onchange="updateStoreLocation(this.value)" class="bg-[#0d1914] text-xs font-medium text-emerald-200 border border-emerald-500/30 rounded-xl px-2.5 py-2 focus:outline-none focus:border-emerald-400 transition cursor-pointer">
+          <option value="CanopySync Charlotte Live Demo">📍 Demo: All Charlotte Inventory</option>
+          <option value="CannaBuddy (E Independence Blvd)">📍 CannaBuddy (E Independence)</option>
+          <option value="Apotheca (Monroe Rd)">📍 Apotheca (Monroe Rd)</option>
+          <option value="Apotheca (South End)">📍 Apotheca (South End)</option>
+          <option value="Common Market (Monroe Rd)">📍 Common Market (Monroe Rd)</option>
+          <option value="Kanna Collective (South End)">📍 Kanna Collective Lounge</option>
+        </select>
+
+        <!-- Founder Settings / Agent ID Button -->
+        <button onclick="toggleConfigModal()" title="Configure ElevenLabs Agent ID" class="p-2 rounded-xl bg-[#0d1914] hover:bg-emerald-950/60 text-slate-300 hover:text-emerald-300 border border-emerald-500/20 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-4xl mx-auto px-4 pt-5 space-y-6">
+
+    <!-- HERO BANNER -->
+    <section class="text-center space-y-2">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-medium">
+        <span>✨ Skip the line • Real-Time Price & Stock Check</span>
+      </div>
+      <h1 id="storeHeroHeading" class="font-display text-2xl sm:text-4xl font-bold tracking-tight text-white">
+        Your Personal AI Budtender
+      </h1>
+      <p class="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto">
+        Tap a vibe starter below or speak directly with the AI Budtender to find your exact strain, check live inventory pricing, and grab a <span class="text-emerald-300 font-semibold">10% OFF Express Counter Ticket</span>.
+      </p>
+    </section>
+
+    <!-- STEP 1: 4 ONE-TAP VIBE STARTER PILLS -->
+    <section aria-label="Quick Vibe Starters" class="space-y-2.5">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+          <span>1. Tap Your Vibe (Copies Prompt + Filters Picks)</span>
+        </h2>
+        <span class="text-[11px] text-slate-400">One-Tap Speed Starters</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <!-- Vibe 1: Sleep -->
+        <button onclick="selectVibe('sleep', 'What do you have in stock right now for deep sleep and relaxation without morning grogginess?')" 
+          id="vibe-sleep"
+          class="vibe-btn group text-left p-3 rounded-2xl glass-card hover:border-emerald-400/70 transition-all duration-200 flex flex-col justify-between">
+          <div class="flex items-center justify-between w-full mb-1.5">
+            <span class="text-xl">🌙</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/20">Indica / CBN</span>
+          </div>
+          <div>
+            <p class="font-semibold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition">Deep Sleep & Calm</p>
+            <p class="text-[11px] text-slate-400 line-clamp-1 mt-0.5">"What's in stock for sleep?"</p>
+          </div>
+        </button>
+
+        <!-- Vibe 2: Focus -->
+        <button onclick="selectVibe('focus', 'What do you recommend in stock for clean daytime focus and energy with zero anxiety?')" 
+          id="vibe-focus"
+          class="vibe-btn group text-left p-3 rounded-2xl glass-card hover:border-emerald-400/70 transition-all duration-200 flex flex-col justify-between">
+          <div class="flex items-center justify-between w-full mb-1.5">
+            <span class="text-xl">⚡</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/20">Zero Anxiety</span>
+          </div>
+          <div>
+            <p class="font-semibold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition">Daytime Focus</p>
+            <p class="text-[11px] text-slate-400 line-clamp-1 mt-0.5">"Clean energy, no jitters"</p>
+          </div>
+        </button>
+
+        <!-- Vibe 3: Edibles & Drinks -->
+        <button onclick="selectVibe('edibles', 'Show me your best in-stock smoke-free gummies and fast-acting THC drinks.')" 
+          id="vibe-edibles"
+          class="vibe-btn group text-left p-3 rounded-2xl glass-card hover:border-emerald-400/70 transition-all duration-200 flex flex-col justify-between">
+          <div class="flex items-center justify-between w-full mb-1.5">
+            <span class="text-xl">🍬</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-400/20">Smoke-Free</span>
+          </div>
+          <div>
+            <p class="font-semibold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition">Edibles & Seltzers</p>
+            <p class="text-[11px] text-slate-400 line-clamp-1 mt-0.5">"Gummies & social tonics"</p>
+          </div>
+        </button>
+
+        <!-- Vibe 4: Value Under $35 -->
+        <button onclick="selectVibe('value', 'What are your best Priority House Specials and flower eighths under $35 in stock today?')" 
+          id="vibe-value"
+          class="vibe-btn group text-left p-3 rounded-2xl glass-card hover:border-emerald-400/70 transition-all duration-200 flex flex-col justify-between">
+          <div class="flex items-center justify-between w-full mb-1.5">
+            <span class="text-xl">🔥</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Priority Push</span>
+          </div>
+          <div>
+            <p class="font-semibold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition">Best Under $35</p>
+            <p class="text-[11px] text-slate-400 line-clamp-1 mt-0.5">"Top house value picks"</p>
+          </div>
+        </button>
+      </div>
+
+      <!-- Interactive Prompt Copy Banner (Appears when a user clicks a Vibe Pill) -->
+      <div id="promptCopiedBanner" class="hidden rounded-xl bg-emerald-950/90 border border-emerald-400/40 px-3.5 py-2.5 flex items-center justify-between gap-2 text-xs text-emerald-200">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span><strong>Copied to clipboard:</strong> <span id="copiedPromptText" class="italic text-white"></span> — Paste into the chat or say it out loud!</span>
+        </div>
+        <button onclick="document.getElementById('promptCopiedBanner').classList.add('hidden')" class="text-emerald-400 hover:text-white font-bold px-1">✕</button>
+      </div>
+    </section>
+
+    <!-- STEP 2: ELEVENLABS AI BUDTENDER LIVE DOCK -->
+    <section class="glass-card emerald-glow-box rounded-3xl p-4 sm:p-6 relative overflow-hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-emerald-900/50">
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <div class="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-xl">
+              🎙️
+            </div>
+            <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-400 ring-2 ring-[#0d1914]"></span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="font-display font-bold text-base sm:text-lg text-white">Ask CanopySync AI (Voice or Text)</h2>
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300">Apps Script Cached ~100ms</span>
+            </div>
+            <p class="text-xs text-slate-400">Connected to 103 live strains • Automatically pivots if an item is Out of Stock</p>
+          </div>
+        </div>
+
+        <!-- Quick Test Questions Dropdown for Manager Demos -->
+        <div class="flex items-center gap-1.5">
+          <button onclick="copySampleQuestion('Is Wedding Cake in stock right now?')" class="text-[11px] px-2.5 py-1.5 rounded-xl bg-slate-900/90 hover:bg-emerald-950 text-slate-300 hover:text-emerald-300 border border-slate-700/70 transition">
+            Test Sold-Out Pivot ("Wedding Cake")
+          </button>
+        </div>
+      </div>
+
+      <!-- ElevenLabs Widget Mount Point -->
+      <div class="mt-4 min-h-[140px] rounded-2xl bg-[#070e0b]/90 border border-emerald-950/90 p-4 flex flex-col items-center justify-center text-center relative">
+        <div id="elevenlabsWidgetWrapper" class="w-full flex flex-col items-center justify-center py-2">
+          <!-- The official ElevenLabs custom element is injected here dynamically with saved agent-id -->
+          <div id="widgetContainer"></div>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-2 max-w-md">
+          💡 <strong>Tip for In-Store Shoppers:</strong> Tap the floating voice/chat orb to speak or type. Once the AI recommends your strain, tap it below to generate your <strong>10% OFF Register Ticket</strong>.
+        </p>
+      </div>
+    </section>
+
+    <!-- STEP 3: LIVE FEATURED INVENTORY & EXPRESS ORDER TICKET BUILDER -->
+    <section class="space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+            2. Tap Your AI-Recommended Strain (Builds Your Register Ticket)
+          </h2>
+          <p class="text-xs text-slate-400">Showing Priority In-Stock Picks from <code class="text-emerald-300">CanopySync AI Live Data</code></p>
+        </div>
+
+        <!-- Filter Reset button -->
+        <button onclick="renderInventoryGrid('all')" class="text-xs text-emerald-400 hover:text-emerald-300 underline">
+          Show All Featured (8)
+        </button>
+      </div>
+
+      <!-- Dynamic Strain Cards Grid -->
+      <div id="inventoryGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Populated by JavaScript -->
+      </div>
+
+      <!-- Custom Strain Entry (In case the AI recommends any of the other 103 rows in the sheet) -->
+      <div class="glass-card rounded-2xl p-3.5 flex flex-col sm:flex-row items-center gap-2.5">
+        <div class="flex-1 w-full">
+          <label for="customStrainInput" class="block text-[11px] font-medium text-emerald-300 mb-1">
+            Did the AI recommend another item from our 103-row menu? Type or add it here:
+          </label>
+          <div class="flex gap-2">
+            <input id="customStrainInput" type="text" placeholder="e.g. Permanent Marker ($50 / Eighth) or Mango Tonic..." 
+              class="w-full bg-[#070e0b] text-xs sm:text-sm text-white rounded-xl px-3 py-2 border border-emerald-900/80 focus:outline-none focus:border-emerald-400" />
+            <button onclick="addCustomStrainToTicket()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-semibold text-xs whitespace-nowrap transition">
+              + Add to Ticket
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- STICKY BOTTOM "SHOW TO BUDTENDER" BAR -->
+  <div class="fixed bottom-0 inset-x-0 z-40 bg-[#060c09]/95 backdrop-blur-xl border-t border-emerald-500/30 px-4 py-3 shadow-2xl">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 font-bold text-sm shrink-0" id="selectedCountBadge">
+          1
+        </div>
+        <div class="truncate">
+          <p class="text-[11px] uppercase tracking-wider font-semibold text-emerald-400">Express Counter Pass Ready</p>
+          <p id="stickySelectedSummary" class="text-xs sm:text-sm font-semibold text-white truncate">Northern Lights ($35 / Eighth)</p>
+        </div>
+      </div>
+
+      <button onclick="openTicketModal()" class="px-4 sm:px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-slate-950 font-display font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/25 flex items-center gap-2 shrink-0 transition transform active:scale-95">
+        <span>🎟️ Show to Budtender</span>
+        <span class="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-slate-950/20 font-sans">+10% VIP</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL 1: HIGH-CONTRAST "SHOW TO BUDTENDER" EXPRESS ORDER TICKET -->
+  <div id="ticketModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white text-slate-950 w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border-4 border-emerald-400 my-8">
+      <!-- Top High-Visibility Cashier Header -->
+      <div class="bg-emerald-500 text-slate-950 px-5 py-4 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-widest bg-slate-950 text-emerald-400 px-2 py-0.5 rounded">EXPRESS REGISTER TICKET</span>
+          <h3 class="font-display text-xl font-extrabold mt-1">SHOW TO BUDTENDER</h3>
+        </div>
+        <button onclick="closeTicketModal()" class="w-9 h-9 rounded-full bg-slate-950/15 hover:bg-slate-950/25 flex items-center justify-center font-bold text-lg">
+          ✕
+        </button>
+      </div>
+
+      <!-- Ticket Body -->
+      <div class="p-5 space-y-4">
+        <!-- Store & Timestamp -->
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3 text-xs">
+          <div>
+            <p class="text-slate-500 font-medium">DISPENSARY LOCATION</p>
+            <p id="ticketStoreName" class="font-bold text-slate-900 text-sm">CanopySync Charlotte Live Demo</p>
+          </div>
+          <div class="text-right">
+            <p class="text-slate-500 font-medium">VERIFIED IN-STOCK</p>
+            <p id="ticketTimestamp" class="font-mono font-bold text-emerald-700">LIVE NOW</p>
+          </div>
+        </div>
+
+        <!-- Selected Items List (Huge & Readable from 4 Feet Away) -->
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Customer AI Selection:</p>
+          <div id="ticketItemsList" class="space-y-2">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- VIP Email Capture for 10% OFF Unlock -->
+        <div class="bg-slate-100 rounded-2xl p-3.5 border border-slate-200">
+          <div id="vipUnlockForm">
+            <label for="vipEmailInput" class="block text-xs font-bold text-slate-800 mb-1">
+              🎁 Unlock Instant 10% OFF VIP Discount Code:
+            </label>
+            <div class="flex gap-2">
+              <input id="vipEmailInput" type="email" placeholder="Enter your email or mobile #..." 
+                class="w-full bg-white text-slate-900 text-xs rounded-xl px-3 py-2 border border-slate-300 focus:outline-none focus:border-emerald-600" />
+              <button onclick="unlockVipCode()" class="px-3.5 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-emerald-400 font-bold text-xs shrink-0 transition">
+                Unlock 10%
+              </button>
+            </div>
+          </div>
+
+          <!-- Revealed VIP Code Box -->
+          <div id="vipUnlockedBadge" class="hidden text-center py-1">
+            <p class="text-[11px] font-bold uppercase text-emerald-700">VIP Lead Logged • Apply Register Promo:</p>
+            <p class="font-mono text-2xl font-black tracking-widest text-slate-950 mt-0.5">CANOPYVIP10</p>
+            <p class="text-[11px] text-slate-500">10% OFF First AI Budtender Order</p>
+          </div>
+        </div>
+
+        <!-- Visual Cashier Barcode -->
+        <div class="pt-2 text-center space-y-1">
+          <div class="visual-barcode h-12 w-full rounded"></div>
+          <p class="font-mono text-[10px] tracking-widest text-slate-400">CANOPYSYNC-CLT-LIVE-PILOT</p>
+        </div>
+      </div>
+
+      <!-- Ticket Footer -->
+      <div class="bg-slate-950 text-slate-300 px-5 py-3 flex items-center justify-between text-xs">
+        <span>Powered by <strong class="text-emerald-400">CanopySync AI</strong></span>
+        <button onclick="closeTicketModal()" class="text-emerald-400 font-semibold hover:underline">Done / Edit Picks</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: FOUNDER AGENT ID CONFIGURATOR (Gear Icon) -->
+  <div id="configModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 border border-emerald-500/40 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-display font-bold text-lg text-white">⚙️ ElevenLabs Agent Configuration</h3>
+        <button onclick="toggleConfigModal()" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+      <p class="text-xs text-slate-300">
+        Paste your ElevenLabs Conversational AI <code class="text-emerald-300">agent-id</code> below so the live voice/chat orb mounts directly onto this kiosk page.
+      </p>
+      <div>
+        <label for="agentIdInput" class="block text-xs font-semibold text-emerald-400 mb-1">ElevenLabs Agent ID</label>
+        <input id="agentIdInput" type="text" placeholder="e.g. agent_01j8x..." 
+          class="w-full bg-[#070e0b] text-white text-xs sm:text-sm font-mono rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400" />
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button onclick="toggleConfigModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">Cancel</button>
+        <button onclick="saveAgentId()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold">Save & Mount Widget</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Curated Priority House Specials from the 103-row Google Sheet
+    const featuredInventory = [
+      {
+        id: 'northern-lights',
+        strain: 'Northern Lights',
+        type: 'Indica Flower',
+        thca: '24% THCA',
+        effects: 'Deep body relaxation, sleep, calm',
+        price: '$35 / Eighth',
+        vibe: ['sleep', 'value'],
+        priority: true,
+        inStock: true
+      },
+      {
+        id: 'midnight-berry',
+        strain: 'Midnight Berry 1:1 Gummies',
+        type: 'Indica Edible',
+        thca: '10mg THC : 10mg CBN',
+        effects: 'Gentle smoke-free sleep, zero paranoia',
+        price: '$25 / 10-pack',
+        vibe: ['sleep', 'edibles', 'value'],
+        priority: true,
+        inStock: true
+      },
+      {
+        id: 'jack-herer',
+        strain: 'Jack Herer',
+        type: 'Sativa Flower',
+        thca: '22% THCA',
+        effects: 'Clear-headed creative focus, daytime energy',
+        price: '$38 / Eighth',
+        vibe: ['focus'],
+        priority: true,
+        inStock: true
+      },
+      {
+        id: 'harlequin-cbd',
+        strain: 'Harlequin 2:1 CBD:THCA',
+        type: 'CBD Hybrid Flower',
+        thca: '14% CBD / 7% THCA',
+        effects: 'Ultra-gentle daytime calm, zero overwhelm',
+        price: '$30 / Eighth',
+        vibe: ['focus', 'value'],
+        priority: true,
+        inStock: true
+      },
+      {
+        id: 'blue-dream',
+        strain: 'Blue Dream',
+        type: 'Balanced Hybrid Flower',
+        thca: '21% THCA',
+        effects: 'Smooth euphoria, chill social vibe, no anxiety',
+        price: '$35 / Eighth',
+        vibe: ['focus', 'value'],
+        priority: true,
+        inStock: true
+      },
+      {
+        id: 'yuzu-seltzer',
+        strain: 'Yuzu Citrus THC Social Seltzer',
+        type: 'Hybrid Beverage',
+        thca: '5mg Nano-THC : 5mg CBD',
+        effects: 'Fast 15-minute onset, alcohol-free patio buzz',
+        price: '$18 / 4-pack',
+        vibe: ['edibles', 'focus', 'value'],
+        priority: true,
+        inStock: true
+      },
+      {
+        id: 'gelato-cart',
+        strain: 'Gelato Live Rosin Cart',
+        type: 'Hybrid Vape',
+        thca: '82% THCA',
+        effects: 'Fast-acting balanced stress relief',
+        price: '$40 / 0.5g',
+        vibe: ['sleep', 'focus'],
+        priority: true,
+        inStock: true
+      },
+      {
+        id: 'runtz',
+        strain: 'Runtz',
+        type: 'Balanced Hybrid Flower',
+        thca: '27% THCA',
+        effects: 'Euphoric head buzz with smooth body relaxation',
+        price: '$45 / Eighth',
+        vibe: ['sleep'],
+        priority: true,
+        inStock: true
+      }
+    ];
+
+    // State for selected items on the customer's Express Order Ticket
+    let selectedItems = [featuredInventory[0]];
+
+    // Copy helper that works inside iframes & mobile browsers
+    function copyTextToClipboard(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        console.error('Copy fallback failed', err);
+      }
+      document.body.removeChild(textArea);
+    }
+
+    // 1. Store Switcher Logic (for Monday Charlotte Dispensary Visits)
+    function updateStoreLocation(storeName) {
+      document.getElementById('storeHeroHeading').textContent = storeName.includes('Demo')
+        ? 'Your Personal AI Budtender'
+        : storeName.split('(')[0].trim() + ' — AI Budtender';
+      document.getElementById('activeStoreSubtext').textContent = storeName + ' • 103 Live Items Synced';
+      document.getElementById('ticketStoreName').textContent = storeName;
+    }
+
+    // 2. One-Tap Vibe Starter Pill Click Handler
+    function selectVibe(vibeKey, promptText) {
+      copyTextToClipboard(promptText);
+
+      // Highlight active pill
+      document.querySelectorAll('.vibe-btn').forEach(btn => {
+        btn.classList.remove('ring-2', 'ring-emerald-400', 'bg-emerald-950/60');
+      });
+      const activeBtn = document.getElementById('vibe-' + vibeKey);
+      if (activeBtn) {
+        activeBtn.classList.add('ring-2', 'ring-emerald-400', 'bg-emerald-950/60');
+      }
+
+      // Show toast confirmation
+      const banner = document.getElementById('promptCopiedBanner');
+      document.getElementById('copiedPromptText').textContent = '"' + promptText + '"';
+      banner.classList.remove('hidden');
+
+      // Filter featured cards below to match the vibe immediately
+      renderInventoryGrid(vibeKey);
+    }
+
+    function copySampleQuestion(questionText) {
+      copyTextToClipboard(questionText);
+      const banner = document.getElementById('promptCopiedBanner');
+      document.getElementById('copiedPromptText').textContent = '"' + questionText + '"';
+      banner.classList.remove('hidden');
+    }
+
+    // 3. Render Featured Inventory Grid
+    function renderInventoryGrid(filterVibe = 'all') {
+      const grid = document.getElementById('inventoryGrid');
+      const items = filterVibe === 'all'
+        ? featuredInventory
+        : featuredInventory.filter(item => item.vibe.includes(filterVibe));
+
+      grid.innerHTML = items.map(item => {
+        const isSelected = selectedItems.some(sel => sel.id === item.id);
+        return `
+          <div onclick="toggleSelectStrain('${item.id}')" 
+            class="cursor-pointer rounded-2xl p-3.5 transition-all border ${
+              isSelected 
+                ? 'bg-emerald-950/60 border-emerald-400 ring-1 ring-emerald-400' 
+                : 'glass-card hover:border-emerald-500/50'
+            } flex items-start justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="font-display font-bold text-sm text-white">${item.strain}</span>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                  ⭐ Priority Push
+                </span>
+              </div>
+              <p class="text-[11px] text-emerald-300/90 font-medium">${item.type} • ${item.thca}</p>
+              <p class="text-xs text-slate-400">${item.effects}</p>
+            </div>
+            <div class="text-right shrink-0 flex flex-col items-end justify-between h-full">
+              <span class="font-mono font-bold text-xs sm:text-sm text-white bg-slate-900/90 px-2.5 py-1 rounded-xl border border-slate-700">${item.price}</span>
+              <span class="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold ${isSelected ? 'text-emerald-300' : 'text-slate-400'}">
+                ${isSelected ? '✓ On Ticket' : '+ Tap to Add'}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleSelectStrain(id) {
+      const item = featuredInventory.find(i => i.id === id);
+      if (!item) return;
+
+      const exists = selectedItems.some(sel => sel.id === id);
+      if (exists && selectedItems.length > 1) {
+        selectedItems = selectedItems.filter(sel => sel.id !== id);
+      } else if (!exists) {
+        selectedItems.push(item);
+      }
+      updateStickyTicketBar();
+      renderInventoryGrid('all');
+    }
+
+    function addCustomStrainToTicket() {
+      const input = document.getElementById('customStrainInput');
+      const val = input.value.trim();
+      if (!val) return;
+
+      selectedItems.push({
+        id: 'custom-' + Date.now(),
+        strain: val,
+        type: 'AI Custom Menu Pick',
+        thca: 'Verified In-Stock',
+        effects: 'Recommended by CanopySync AI Budtender',
+        price: 'Menu Price'
+      });
+      input.value = '';
+      updateStickyTicketBar();
+      openTicketModal();
+    }
+
+    function updateStickyTicketBar() {
+      document.getElementById('selectedCountBadge').textContent = selectedItems.length;
+      const names = selectedItems.map(i => `${i.strain} (${i.price})`).join(' + ');
+      document.getElementById('stickySelectedSummary').textContent = names;
+    }
+
+    // 4. Express Order Ticket Modal
+    function openTicketModal() {
+      const list = document.getElementById('ticketItemsList');
+      const now = new Date();
+      document.getElementById('ticketTimestamp').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' TODAY';
+
+      list.innerHTML = selectedItems.map(item => `
+        <div class="bg-slate-50 border-2 border-slate-900 rounded-2xl p-3 flex items-center justify-between">
+          <div>
+            <p class="font-display font-extrabold text-base sm:text-lg text-slate-950">${item.strain}</p>
+            <p class="text-xs font-semibold text-emerald-700">${item.type} • ${item.thca}</p>
+          </div>
+          <span class="font-mono font-black text-sm sm:text-base bg-emerald-400 text-slate-950 px-3 py-1 rounded-xl">
+            ${item.price}
+          </span>
+        </div>
+      `).join('');
+
+      document.getElementById('ticketModal').classList.remove('hidden');
+    }
+
+    function closeTicketModal() {
+      document.getElementById('ticketModal').classList.add('hidden');
+    }
+
+    function unlockVipCode() {
+      const email = document.getElementById('vipEmailInput').value.trim();
+      if (!email) return;
+      document.getElementById('vipUnlockForm').classList.add('hidden');
+      document.getElementById('vipUnlockedBadge').classList.remove('hidden');
+    }
+
+    // 5. ElevenLabs Agent ID Configurator
+    function toggleConfigModal() {
+      const modal = document.getElementById('configModal');
+      modal.classList.toggle('hidden');
+      const currentId = localStorage.getItem('canopysync_agent_id') || '';
+      document.getElementById('agentIdInput').value = currentId;
+    }
+
+    function saveAgentId() {
+      const newId = document.getElementById('agentIdInput').value.trim();
+      if (newId) {
+        localStorage.setItem('canopysync_agent_id', newId);
+        mountElevenLabsWidget(newId);
+      }
+      toggleConfigModal();
+    }
+
+    function mountElevenLabsWidget(agentId) {
+      const container = document.getElementById('widgetContainer');
+      if (!agentId) {
+        container.innerHTML = `
+          <div class="space-y-2 py-2">
+            <p class="text-xs text-emerald-300 font-semibold">ElevenLabs Voice & Chat Widget Ready</p>
+            <button onclick="toggleConfigModal()" class="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold transition">
+              ⚙️ Click to Link Your ElevenLabs Agent ID
+            </button>
+          </div>
+        `;
+        return;
+      }
+      container.innerHTML = `<elevenlabs-convai agent-id="${agentId}"></elevenlabs-convai>`;
+    }
+
+    // Initialize on load
+    window.onload = function() {
+      renderInventoryGrid('all');
+      updateStickyTicketBar();
+      const savedAgentId = localStorage.getItem('canopysync_agent_id') || '';
+      mountElevenLabsWidget(savedAgentId);
+    };
+  </script>
 </body>
 </html>
