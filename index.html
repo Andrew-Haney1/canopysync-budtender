@@ -5,235 +5,258 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CanopySync AI — Virtual Budtender</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      background-color: #0b1310;
-      color: #e2f8ef;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      padding: 24px;
+      background: radial-gradient(circle at top, #0f291e 0%, #07110d 65%, #050a08 100%);
+      color: #ecfdf5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
+      padding: 24px 16px 100px;
     }
-    .container {
+
+    .wrapper {
       width: 100%;
-      max-width: 600px;
+      max-width: 640px;
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
-    header {
-      background: #13221b;
-      border: 1px solid #1e3329;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
-    h1 { font-size: 22px; color: #10b981; margin-bottom: 6px; }
-    p.subtitle { font-size: 13px; color: #9ca3af; }
 
-    /* Vibe Starter Pills */
-    .pills {
+    /* Top Header */
+    .header {
       display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 4px;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(16, 36, 27, 0.85);
+      border: 1px solid #1e3a2f;
+      border-radius: 14px;
+      padding: 14px 18px;
     }
-    .pill {
-      background: #13221b;
-      border: 1px solid #233f32;
-      color: #34d399;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s;
-    }
-    .pill:hover { background: #10b981; color: #000; }
 
-    /* Chat UI Box */
-    #chat-container {
+    .brand {
       display: flex;
-      flex-direction: column;
-      height: 400px;
-      background: #13221b;
-      border-radius: 12px;
-      border: 1px solid #1e3329;
-      padding: 16px;
-    }
-    #chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 12px;
-      margin-bottom: 12px;
-      padding-right: 6px;
     }
-    .message {
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #10b981;
+      color: #05130d;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .brand-text h1 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .brand-text p {
+      font-size: 12px;
+      color: #6ee7b7;
+    }
+
+    .badge {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 999px;
+    }
+
+    /* Main Hero Card */
+    .hero-card {
+      background: rgba(13, 28, 22, 0.9);
+      border: 1px solid #1e3a2f;
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    .hero-card h2 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .hero-card p {
+      font-size: 14px;
+      color: #a7f3d0;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    /* Simple One-Tap Starter Pills */
+    .vibe-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      text-align: left;
+    }
+
+    .vibe-btn {
+      background: #091611;
+      border: 1px solid #1f4233;
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #ecfdf5;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .vibe-btn:hover {
+      border-color: #10b981;
+      background: #112a20;
+    }
+
+    .vibe-btn strong {
+      display: block;
+      font-size: 14px;
+      color: #34d399;
+      margin-bottom: 2px;
+    }
+
+    .vibe-btn span {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .copied-toast {
+      display: none;
+      margin-top: 14px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10b981;
+      color: #6ee7b7;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    /* Express Register Ticket */
+    .ticket-bar {
+      background: rgba(16, 36, 27, 0.95);
+      border: 1px solid #10b981;
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .ticket-text h3 {
+      font-size: 14px;
+      color: #34d399;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    .ticket-text p {
+      font-size: 13px;
+      color: #d1fae5;
+    }
+
+    .vip-code {
+      background: #10b981;
+      color: #04120c;
+      font-weight: 800;
+      font-size: 14px;
       padding: 10px 14px;
       border-radius: 8px;
-      max-width: 85%;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-    .bot-msg {
-      background: #0b1310;
-      border: 1px solid #233f32;
-      align-self: flex-start;
-      color: #e2f8ef;
-    }
-    .user-msg {
-      background: #10b981;
-      color: #000;
-      align-self: flex-end;
-      font-weight: 500;
-    }
-    .chat-input-area {
-      display: flex;
-      gap: 8px;
-    }
-    #chat-input {
-      flex: 1;
-      background: #070d0b;
-      border: 1px solid #233f32;
-      border-radius: 8px;
-      padding: 12px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-    }
-    #chat-input:focus { border-color: #10b981; }
-    button.send-btn {
-      background: #10b981;
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      padding: 0 20px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    button.send-btn:hover { background: #059669; }
-
-    /* Express Ticket Card */
-    .ticket-card {
-      background: #13221b;
-      border: 1px solid #10b981;
-      border-radius: 12px;
-      padding: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .ticket-info h3 { font-size: 15px; color: #10b981; margin-bottom: 4px; }
-    .ticket-info p { font-size: 13px; color: #9ca3af; }
-    .code-badge {
-      background: #10b981;
-      color: #000;
-      font-weight: bold;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 13px;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <header>
-      <h1>CanopySync AI Budtender</h1>
-      <p class="subtitle">Connected to 103 live strains • Instant Cached Inventory (~100ms)</p>
-    </header>
-
-    <!-- One-Tap Vibe Starters -->
-    <div class="pills">
-      <div class="pill" onclick="sendPreset('deep sleep and physical relaxation')">🌙 Deep Sleep</div>
-      <div class="pill" onclick="sendPreset('daytime focus zero anxiety')">⚡ Daytime Focus</div>
-      <div class="pill" onclick="sendPreset('smoke-free edibles and drinks')">🍬 Edibles & Seltzers</div>
-      <div class="pill" onclick="sendPreset('best value flower under \$35')">🔥 Best Under \$35</div>
-    </div>
-
-    <!-- Text Chat Box -->
-    <div id="chat-container">
-      <div id="chat-messages">
-        <div class="message bot-msg">
-          👋 Hey! I'm your virtual budtender. Looking for sleep, focus, or a specific strain today? Type below or tap a vibe above!
+  <div class="wrapper">
+    <!-- Clean Header -->
+    <div class="header">
+      <div class="brand">
+        <div class="logo">🌿</div>
+        <div class="brand-text">
+          <h1>CanopySync AI</h1>
+          <p>Live Dispensary Menu • 103 Strains Synced</p>
         </div>
       </div>
-      <div class="chat-input-area">
-        <input type="text" id="chat-input" placeholder="Type what you're looking for (e.g., indica for sleep)..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
-        <button class="send-btn" onclick="sendChatMessage()">Send</button>
+      <div class="badge">LIVE PILOT</div>
+    </div>
+
+    <!-- Simplified Main Card -->
+    <div class="hero-card">
+      <h2>Your Personal AI Budtender</h2>
+      <p>Tap a quick starter below (copies to your clipboard) and paste it into the chat bubble in the bottom corner.</p>
+
+      <div class="vibe-grid">
+        <button class="vibe-btn" onclick="copyPrompt('What do you have in stock right now for deep sleep and relaxation?')">
+          <strong>🌙 Deep Sleep</strong>
+          <span>"What's in stock for sleep?"</span>
+        </button>
+
+        <button class="vibe-btn" onclick="copyPrompt('What do you recommend for daytime focus with zero anxiety?')">
+          <strong>⚡ Daytime Focus</strong>
+          <span>"Clean energy, no jitters"</span>
+        </button>
+
+        <button class="vibe-btn" onclick="copyPrompt('What smoke-free gummies, edibles, or THC drinks are in stock?')">
+          <strong>🍬 Edibles & Drinks</strong>
+          <span>"Gummies & social tonics"</span>
+        </button>
+
+        <button class="vibe-btn" onclick="copyPrompt('What are your best house specials and flower eighths under $35?')">
+          <strong>🔥 Best Under $35</strong>
+          <span>"Top value picks in stock"</span>
+        </button>
+      </div>
+
+      <div id="toast" class="copied-toast">
+        ✅ Copied! Click the chat bubble in the bottom-right corner to paste.
       </div>
     </div>
 
-    <!-- Express Ticket Flash Card -->
-    <div class="ticket-card">
-      <div class="ticket-info">
-        <h3>Show to Budtender at Register</h3>
-        <p>Flash this code to instantly claim your 10% pilot discount.</p>
+    <!-- Show to Budtender VIP Ticket -->
+    <div class="ticket-bar">
+      <div class="ticket-text">
+        <h3>Express Register Pass</h3>
+        <p>Show this code to your budtender at checkout for 10% OFF.</p>
       </div>
-      <div class="code-badge">CANOPYVIP10</div>
+      <div class="vip-code">CANOPYVIP10</div>
     </div>
   </div>
 
+  <!-- ElevenLabs Chat Widget (Replace YOUR_ELEVENLABS_AGENT_ID below) -->
+  <elevenlabs-convai agent-id="YOUR_ELEVENLABS_AGENT_ID"></elevenlabs-convai>
+  <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+
   <script>
-    // REPLACE WITH YOUR ACTUAL GOOGLE APPS SCRIPT WEBHOOK URL
-    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbygFWHYP4p7wq-_W-HAmZyZeIKGPKctjK143brSMKvY3_e00Lkwq8MGsimbpQ6aZGY-ww/exec";
-
-    function sendPreset(queryText) {
-      document.getElementById('chat-input').value = queryText;
-      sendChatMessage();
-    }
-
-    async function sendChatMessage() {
-      const input = document.getElementById('chat-input');
-      const messages = document.getElementById('chat-messages');
-      const query = input.value.trim();
-      if (!query) return;
-
-      // Append user message
-      messages.innerHTML += `<div class="message user-msg">${escapeHtml(query)}</div>`;
-      input.value = '';
-      messages.scrollTop = messages.scrollHeight;
-
-      // Append loading indicator
-      const loadingId = 'loading-' + Date.now();
-      messages.innerHTML += `<div id="${loadingId}" class="message bot-msg" style="color: #9ca3af;">Searching 103 live strains...</div>`;
-      messages.scrollTop = messages.scrollHeight;
-
-      try {
-        const response = await fetch(WEBHOOK_URL + "?query=" + encodeURIComponent(query));
-        const data = await response.json();
-
-        document.getElementById(loadingId).remove();
-
-        if (data.status === "success" && data.in_stock_recommendations && data.in_stock_recommendations.length > 0) {
-          let replyHTML = `<div class="message bot-msg">`;
-          if (data.out_of_stock_notice) {
-            replyHTML += `<b style="color: #f87171;">⚠️ ${escapeHtml(data.out_of_stock_notice)}</b><br><br>`;
-          }
-          replyHTML += `<b>Top Recommendations:</b><ul style="margin: 6px 0 0 16px; padding: 0;">`;
-          data.in_stock_recommendations.forEach(item => {
-            replyHTML += `<li style="margin-bottom: 8px;"><b>${escapeHtml(item.strain)}</b> (${escapeHtml(item.type)}) — ${escapeHtml(item.price)}<br><span style="color: #34d399; font-size: 12px;">Effects: ${escapeHtml(item.effects)}</span></li>`;
-          });
-          replyHTML += `</ul></div>`;
-          messages.innerHTML += replyHTML;
-        } else {
-          messages.innerHTML += `<div class="message bot-msg">I couldn't find an exact match for that, but feel free to ask for Indica, Sativa, edibles, or sleep aids!</div>`;
-        }
-      } catch (err) {
-        document.getElementById(loadingId).remove();
-        messages.innerHTML += `<div class="message bot-msg" style="border-color: #f87171; color: #f87171;">Error connecting to inventory webhook. Check URL configuration.</div>`;
-      }
-      messages.scrollTop = messages.scrollHeight;
-    }
-
-    function escapeHtml(text) {
-      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    function copyPrompt(text) {
+      navigator.clipboard.writeText(text);
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 4000);
     }
   </script>
+
 </body>
 </html>
